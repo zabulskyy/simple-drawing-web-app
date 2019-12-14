@@ -1,95 +1,67 @@
-var canvas, ctx,
-    brush = {
-        x: 0,
-        y: 0,
-        color: '#000000',
-        size: 10,
-        down: false,
-    },
-    strokes = [],
-    currentStroke = null;
+window.onload = function() {
 
-function redraw () {
-    ctx.clearRect(0, 0, canvas.width(), canvas.height());
-    ctx.lineCap = 'round';
-    for (var i = 0; i < strokes.length; i++) {
-        var s = strokes[i];
-        ctx.strokeStyle = s.color;
-        ctx.lineWidth = s.size;
-        ctx.beginPath();
-        ctx.moveTo(s.points[0].x, s.points[0].y);
-        for (var j = 0; j < s.points.length; j++) {
-            var p = s.points[j];
-            ctx.lineTo(p.x, p.y);
-        }
-        ctx.stroke();
+    document.ontouchmove = function(e){ e.preventDefault(); }
+  
+    var canvas  = document.getElementById('main');
+    var canvastop = canvas.offsetTop
+  
+    var context = canvas.getContext("2d");
+  
+    var lastx;
+    var lasty;
+  
+    context.strokeStyle = "#000000";
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+    context.lineWidth = 5;
+  
+    function clear() {
+      context.fillStyle = "#ffffff";
+      context.rect(0, 0, 300, 300);
+      context.fill();
     }
-}
-
-function init () {
-    canvas = $('#draw');
-    canvas.attr({
-        width: window.innerWidth,
-        height: window.innerHeight,
-    });
-    ctx = canvas[0].getContext('2d');
-
-    function mouseEvent (e) {
-        brush.x = e.pageX;
-        brush.y = e.pageY;
-
-        currentStroke.points.push({
-            x: brush.x,
-            y: brush.y,
-        });
-
-        redraw();
+  
+    function dot(x,y) {
+      context.beginPath();
+      context.fillStyle = "#000000";
+      context.arc(x,y,1,0,Math.PI*2,true);
+      context.fill();
+      context.stroke();
+      context.closePath();
     }
-
-    canvas.mousedown(function (e) {
-        brush.down = true;
-
-        currentStroke = {
-            color: brush.color,
-            size: brush.size,
-            points: [],
-        };
-
-        strokes.push(currentStroke);
-
-        mouseEvent(e);
-    }).mouseup(function (e) {
-        brush.down = false;
-
-        mouseEvent(e);
-
-        currentStroke = null;
-    }).mousemove(function (e) {
-        if (brush.down)
-            mouseEvent(e);
-    });
-
-    $('#save-btn').click(function () {
-        window.open(canvas[0].toDataURL());
-    });
-
-    $('#undo-btn').click(function () {
-        strokes.pop();
-        redraw();
-    });
-
-    $('#clear-btn').click(function () {
-        strokes = [];
-        redraw();
-    });
-
-    $('#color-picker').on('input', function () {
-        brush.color = this.value;
-    });
-
-    $('#brush-size').on('input', function () {
-        brush.size = this.value;
-    });
-}
-
-$(init);
+  
+    function line(fromx,fromy, tox,toy) {
+      context.beginPath();
+      context.moveTo(fromx, fromy);
+      context.lineTo(tox, toy);
+      context.stroke();
+      context.closePath();
+    }
+  
+    canvas.ontouchstart = function(event){                   
+      event.preventDefault();                 
+      
+      lastx = event.touches[0].clientX;
+      lasty = event.touches[0].clientY - canvastop;
+  
+      dot(lastx,lasty);
+    }
+  
+    canvas.ontouchmove = function(event){                   
+      event.preventDefault();                 
+  
+      var newx = event.touches[0].clientX;
+      var newy = event.touches[0].clientY - canvastop;
+  
+      line(lastx,lasty, newx,newy);
+      
+      lastx = newx;
+      lasty = newy;
+    }
+  
+  
+    var clearButton = document.getElementById('clear')
+    clearButton.onclick = clear
+  
+    clear()
+  }
