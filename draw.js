@@ -71,7 +71,7 @@ window.onload = function () {
 function getData() {
   const canvas = document.getElementById('main');
   const ctx = canvas.getContext('2d');
-  const imageData = ctx.getData(0, 0, 300, 300);
+  const imageData = ctx.getImageData(0, 0, 300, 300);
   
   let pixels = imageData.data;
   let w = imageData.width;
