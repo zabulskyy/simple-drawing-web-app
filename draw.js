@@ -98,3 +98,7 @@ function getData() {
   }
   return matrix
 }
+
+function printData(){
+  console.log(getData())
+}
